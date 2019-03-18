@@ -2,6 +2,8 @@
 
 使用简单、功能丰富、无依赖的 **iOS图片、文字轮播器**，基于 `UICollectionView` 实现。
 
+![](https://github.com/kysonyangs/YSBannerView/blob/master/ysbannerview.gif?raw=true)
+
 ### Installation
 ```
 pod YSBannerView
