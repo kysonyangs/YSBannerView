@@ -1,0 +1,6 @@
+framework module YSBannerView {
+  umbrella header "YSBannerView-umbrella.h"
+
+  export *
+  module * { export * }
+}
