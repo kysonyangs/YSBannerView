@@ -13,7 +13,7 @@
 #import <YYWebImage/YYWebImage.h>
 #import "YSSubViewController.h"
 
-#define kYJSCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
+#define kYSSCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
 
 @interface YSViewController () <YSBannerViewDelegate>
 {
@@ -91,7 +91,7 @@
 #pragma mark - lazy
 - (YSBannerView *)emptyBannerView{
     if (!_emptyBannerView) {
-        _emptyBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, 20, kYJSCREEN_WIDTH, 200)];
+        _emptyBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, 20, kYSSCREEN_WIDTH, 200)];
         _emptyBannerView.placeholderImage = [UIImage imageNamed:@"placeholder"];
         _emptyBannerView.emptyImage = [UIImage imageNamed:@"adempty.jpeg"];
         _emptyBannerView.delegate = self;
@@ -102,9 +102,9 @@
 
 - (YSBannerView *)leftBannerView{
     if (!_leftBannerView) {
-        _leftBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, CGRectGetMaxY(self.emptyBannerView.frame)+10, kYJSCREEN_WIDTH, 200)];
+        _leftBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, CGRectGetMaxY(self.emptyBannerView.frame)+10, kYSSCREEN_WIDTH, 200)];
         _leftBannerView.placeholderImage = [UIImage imageNamed:@"placeholder"];
-        _leftBannerView.autoScrollTimeInterval = 2;
+        _leftBannerView.autoScrollTimeInterval = 5;
         _leftBannerView.titleFont = [UIFont systemFontOfSize:15];
         [_leftBannerView disableScrollGesture];
         _leftBannerView.delegate = self;
@@ -114,7 +114,7 @@
 
 - (YSBannerView *)rightBannerView{
     if (!_rightBannerView) {
-        _rightBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, CGRectGetMaxY(self.leftBannerView.frame) + 15, kYJSCREEN_WIDTH, 200)];
+        _rightBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, CGRectGetMaxY(self.leftBannerView.frame) + 15, kYSSCREEN_WIDTH, 200)];
         _rightBannerView.pageControlStyle = YSPageControlHollow;
         _rightBannerView.currentPageDotImage = [UIImage imageNamed:@"pageControlCurrentDot"];
         _rightBannerView.pageDotImage = [UIImage imageNamed:@"pageControlDot"];
@@ -143,7 +143,7 @@
 
 - (YSBannerView *)adBannerView{
     if (!_adBannerView) {
-        _adBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(90, CGRectGetMaxY(self.rightBannerView.frame)+10, kYJSCREEN_WIDTH - 60, 40)];
+        _adBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(90, CGRectGetMaxY(self.rightBannerView.frame)+10, kYSSCREEN_WIDTH - 60, 40)];
         _adBannerView.backgroundColor = [UIColor clearColor];
         _adBannerView.delegate = self;
         _adBannerView.scrollDirection = YSBannerViewDirectionTop;
@@ -155,7 +155,7 @@
 
 - (YSBannerView *)topBannerView{
     if (!_topBannerView) {
-        _topBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, CGRectGetMaxY(self.adBannerView.frame) + 10, kYJSCREEN_WIDTH, 200)];
+        _topBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, CGRectGetMaxY(self.adBannerView.frame) + 10, kYSSCREEN_WIDTH, 200)];
         _topBannerView.pageControlStyle = YSPageControlHollow;
         _topBannerView.pageControlBottomMargin = 5.0f;
         _topBannerView.scrollDirection = YSBannerViewDirectionTop;
@@ -167,7 +167,7 @@
 
 - (YSBannerView *)bottomBannerView{
     if (!_bottomBannerView) {
-        _bottomBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, CGRectGetMaxY(self.topBannerView.frame) + 15, kYJSCREEN_WIDTH, 200)];
+        _bottomBannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, CGRectGetMaxY(self.topBannerView.frame) + 15, kYSSCREEN_WIDTH, 200)];
         _bottomBannerView.pageControlStyle = YSPageControlHollow;
         _bottomBannerView.pageDotSize = CGSizeMake(10, 5);
         _bottomBannerView.currentPageDotImage = [UIImage imageNamed:@"pageControlN"];

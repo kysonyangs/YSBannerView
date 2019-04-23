@@ -9,9 +9,12 @@
 #import "YSSubViewController.h"
 #import "YSBannerView.h"
 #import <UIImageView+WebCache.h>
-#define kYJSCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
+#define kYSSCREEN_WIDTH  ([UIScreen mainScreen].bounds.size.width)
 
 @interface YSSubViewController ()
+{
+    NSInteger index;
+}
 @property (nonatomic, strong) YSBannerView *bannerView;
 @end
 
@@ -21,12 +24,12 @@
     [super viewDidLoad];
     self.view.backgroundColor = [UIColor whiteColor];
     
-    _bannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, 100, kYJSCREEN_WIDTH, 200)];
+    _bannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, 100, kYSSCREEN_WIDTH, 200)];
     _bannerView.placeholderImage = [UIImage imageNamed:@"placeholder"];
-    _bannerView.autoScrollTimeInterval = 2;
-    _bannerView.titleFont = [UIFont systemFontOfSize:15];
-    _bannerView.infiniteLoop = NO;
-    _bannerView.scrollDirection = YSBannerViewDirectionRight;
+    _bannerView.itemSpacing = -25;
+    _bannerView.itemSize = CGSizeMake(kYSSCREEN_WIDTH-80, 200);
+    _bannerView.itemZoomFactor = 0.001;
+    _bannerView.autoScroll = YES;
     
     _bannerView.downloadImageBlock = ^(UIImageView *imageView, NSURL *url, UIImage *placeholderImage) {
         [imageView sd_setImageWithURL:url placeholderImage:placeholderImage];

@@ -46,6 +46,7 @@ typedef NS_ENUM(NSInteger, YSBannerViewDirection) {
 @property (nonatomic, strong) UIImage *emptyImage;                      ///< 空数据图片
 @property (nonatomic, strong) UIImage *placeholderImage;                ///< 占位图，用于网络未加载到图片时
 @property (nonatomic, assign) BOOL    onlyDisplayText;                  ///< 只展示文字轮播
+
 @property (nonatomic, assign) BOOL    hidesForSinglePage;               ///< 是否在只有一张图时隐藏pagecontrol，默认: YES
 @property (nonatomic, assign) BOOL    showPageControl;                  ///< 是否展示分页控件
 @property (nonatomic, assign) CGFloat pageControlBottomMargin;          ///< 分页控件距离底部间距 默认: 10
@@ -56,6 +57,12 @@ typedef NS_ENUM(NSInteger, YSBannerViewDirection) {
 @property (nonatomic, strong) UIColor *currentPageDotColor;             ///< 当前分页控件小圆标颜色
 @property (nonatomic, strong) UIImage *pageDotImage;                    ///< 分页控件小圆标正常图片
 @property (nonatomic, strong) UIImage *currentPageDotImage;             ///< 当前分页控件小圆标图片
+
+/// 下面2个选项需要一起使用...
+@property (nonatomic, assign) CGSize itemSize;                          ///< CellSize，默认视图Size
+@property (nonatomic, assign) CGFloat itemSpacing;                      ///< Cell间距 默认: 0
+/// 需要联合上面两个选项一起使用
+@property (nonatomic, assign) CGFloat itemZoomFactor;                   ///< 放大缩小倍数 默认: 0
 
 @property (nonatomic, strong) UIFont  *titleFont;                       ///< 文字大小 默认: 14.0f
 @property (nonatomic, strong) UIColor *titleColor;                      ///< 文字颜色 默认: whiteColor
@@ -80,7 +87,7 @@ typedef NS_ENUM(NSInteger, YSBannerViewDirection) {
 /// 调整滚动到指定位置
 - (void)adjustBannerViewScrollToIndex:(NSInteger)index animated:(BOOL)animated;
 
-/// 禁用滑动手势
+/// 禁用滑动手势 scrollEnable
 - (void)disableScrollGesture;
 
 @end

@@ -14,12 +14,53 @@ static NSInteger const kTotalCount = 200;
 #define kPageControlDotDefaultSize CGSizeMake(8, 8)
 NSString * const YSBannerViewCellID = @"YSBannerViewCellID";
 
+@interface YSBannerFlowLayout : UICollectionViewFlowLayout
+@property (nonatomic, assign) CGFloat zoomFactor; // default 0.f
+@end
+
+@implementation YSBannerFlowLayout
+
+- (NSArray<UICollectionViewLayoutAttributes *> *)layoutAttributesForElementsInRect:(CGRect)rect {
+    NSArray *attributes = [[NSArray alloc] initWithArray:[super layoutAttributesForElementsInRect:rect] copyItems:YES];
+    switch (self.scrollDirection) {
+        case UICollectionViewScrollDirectionVertical: {
+            CGFloat centerY = self.collectionView.contentOffset.y + self.collectionView.bounds.size.height / 2;
+            
+            for (UICollectionViewLayoutAttributes *attr in attributes) {
+                CGFloat distance = ABS(attr.center.y - centerY);
+                CGFloat scale = 1 / (1 + distance * _zoomFactor);
+                attr.transform = CGAffineTransformMakeScale(scale, scale);
+            }
+            break;
+        }
+        default: {
+            CGFloat centerX = self.collectionView.contentOffset.x + self.collectionView.bounds.size.width / 2;
+            
+            for (UICollectionViewLayoutAttributes *attr in attributes) {
+                CGFloat distance = ABS(attr.center.x - centerX);
+                CGFloat scale = 1 / (1 + distance * _zoomFactor);
+                attr.transform = CGAffineTransformMakeScale(scale, scale);
+            }
+            break;
+        }
+    }
+    
+    return attributes;
+}
+
+- (BOOL)shouldInvalidateLayoutForBoundsChange:(CGRect)newBounds {
+    return true;
+}
+
+@end
+
 @interface YSBannerView () <UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout>
 {
     NSInteger _totalItemsCount;
+    BOOL _itemSizeFlag;
 }
 @property (nonatomic, strong) UIImageView *backgroundImageView;
-@property (nonatomic, strong) UICollectionViewFlowLayout *flowLayout;
+@property (nonatomic, strong) YSBannerFlowLayout *flowLayout;
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) UIControl *pageControl;
 @property (nonatomic, weak  ) NSTimer *timer;
@@ -99,6 +140,11 @@ NSString * const YSBannerViewCellID = @"YSBannerViewCellID";
     self.backgroundImageView.frame = self.bounds;
     self.flowLayout.itemSize = self.bounds.size;
     self.collectionView.frame = self.bounds;
+    if (_itemSizeFlag) {
+        self.flowLayout.itemSize = self.itemSize;
+        self.flowLayout.headerReferenceSize = CGSizeMake((self.bounds.size.width - self.itemSize.width) / 2, (self.bounds.size.height - self.itemSize.height) / 2);
+        self.flowLayout.footerReferenceSize = CGSizeMake((self.bounds.size.width - self.itemSize.width) / 2, (self.bounds.size.height - self.itemSize.height) / 2);
+    }
     
     if (self.collectionView.contentOffset.x == 0 && _totalItemsCount) {
         NSInteger targetIndex = self.infiniteLoop?(_totalItemsCount * 0.5):(0);
@@ -258,9 +304,9 @@ NSString * const YSBannerViewCellID = @"YSBannerViewCellID";
     if (self.collectionView.bounds.size.width == 0 || self.collectionView.bounds.size.height == 0) return 0;
     NSInteger index = 0;
     if (self.flowLayout.scrollDirection == UICollectionViewScrollDirectionHorizontal) {
-        index = (self.collectionView.contentOffset.x + self.flowLayout.itemSize.width * 0.5) / self.flowLayout.itemSize.width;
+        index = (self.collectionView.contentOffset.x + self.flowLayout.itemSize.width * 0.5 + self.flowLayout.minimumLineSpacing * 0.5) / (self.flowLayout.itemSize.width + self.flowLayout.minimumLineSpacing);
     } else {
-        index = (self.collectionView.contentOffset.y + self.flowLayout.itemSize.height * 0.5) / self.flowLayout.itemSize.height;
+        index = (self.collectionView.contentOffset.y + self.flowLayout.itemSize.height * 0.5 + self.flowLayout.minimumInteritemSpacing * 0.5) / (self.flowLayout.itemSize.height + self.flowLayout.minimumInteritemSpacing);
     }
     return MAX(0, index);
 }
@@ -285,7 +331,12 @@ NSString * const YSBannerViewCellID = @"YSBannerViewCellID";
 - (void)_ys_scrollBannerViewToSpecifiedPositionIndex:(NSInteger)targetIndex animated:(BOOL)animated {
     NSInteger itemCount = [self.collectionView numberOfItemsInSection:0];
     if (targetIndex < itemCount) {
-        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:targetIndex inSection:0] atScrollPosition:UICollectionViewScrollPositionNone animated:animated];
+        
+        UICollectionViewScrollPosition position = UICollectionViewScrollPositionCenteredVertically;;
+        if (self.scrollDirection == YSBannerViewDirectionLeft || self.scrollDirection == YSBannerViewDirectionRight) {
+            position = UICollectionViewScrollPositionCenteredHorizontally;
+        }
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:targetIndex inSection:0] atScrollPosition:position animated:animated];
     }
 }
 
@@ -419,10 +470,18 @@ NSString * const YSBannerViewCellID = @"YSBannerViewCellID";
     [self scrollViewDidEndScrollingAnimation:self.collectionView];
 }
 
+- (void)scrollViewWillBeginDecelerating:(UIScrollView *)scrollView {
+    if (!self.imageArray.count) return;
+    NSInteger itemIndex = [self _ys_currentPageIndex];
+    [self _ys_scrollToIndex:itemIndex animated:YES];
+}
+
 - (void)scrollViewDidEndScrollingAnimation:(UIScrollView *)scrollView {
     if (!self.imageArray.count) return;
     NSInteger itemIndex = [self _ys_currentPageIndex];
     NSInteger indexOnPageControl = [self _ys_getRealIndexFromCurrentCellIndex:itemIndex];
+    
+    [self _ys_scrollToIndex:itemIndex animated:YES];
     
     if (self.delegate && [self.delegate respondsToSelector:@selector(bannerView:didScrollToIndex:)]) {
         [self.delegate bannerView:self didScrollToIndex:indexOnPageControl];
@@ -499,6 +558,29 @@ NSString * const YSBannerViewCellID = @"YSBannerViewCellID";
     } else if (scrollDirection == YSBannerViewDirectionTop || scrollDirection == YSBannerViewDirectionBottom){
         self.flowLayout.scrollDirection = UICollectionViewScrollDirectionVertical;
     }
+}
+
+- (void)setItemSize:(CGSize)itemSize {
+    _itemSize = itemSize;
+    _itemSizeFlag = YES;
+    self.flowLayout.itemSize = itemSize;
+    self.flowLayout.headerReferenceSize = CGSizeMake((self.bounds.size.width - itemSize.width) / 2, (self.bounds.size.height - itemSize.height) / 2);
+    self.flowLayout.footerReferenceSize = CGSizeMake((self.bounds.size.width - itemSize.width) / 2, (self.bounds.size.height - itemSize.height) / 2);
+}
+
+- (void)setItemSpacing:(CGFloat)itemSpacing {
+    _itemSpacing = itemSpacing;
+    
+    if (self.scrollDirection == YSBannerViewDirectionLeft || self.scrollDirection == YSBannerViewDirectionRight) {
+        self.flowLayout.minimumLineSpacing = itemSpacing;
+    } else if (self.scrollDirection == YSBannerViewDirectionTop || self.scrollDirection == YSBannerViewDirectionBottom){
+        self.flowLayout.minimumInteritemSpacing = itemSpacing;
+    }
+}
+
+- (void)setItemZoomFactor:(CGFloat)itemZoomFactor {
+    _itemZoomFactor = itemZoomFactor;
+    self.flowLayout.zoomFactor = itemZoomFactor;
 }
 
 - (void)setAutoScrollTimeInterval:(CGFloat)autoScrollTimeInterval {
@@ -602,7 +684,7 @@ NSString * const YSBannerViewCellID = @"YSBannerViewCellID";
 
 - (UICollectionViewFlowLayout *)flowLayout {
     if (!_flowLayout) {
-        _flowLayout = [[UICollectionViewFlowLayout alloc] init];
+        _flowLayout = [[YSBannerFlowLayout alloc] init];
         _flowLayout.minimumLineSpacing = 0;
         _flowLayout.scrollDirection = UICollectionViewScrollDirectionHorizontal;
     }
