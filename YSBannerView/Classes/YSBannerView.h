@@ -30,6 +30,25 @@ typedef NS_ENUM(NSInteger, YSBannerViewDirection) {
     YSBannerViewDirectionBottom       // 向下
 };
 
+@class YSBannerView;
+@protocol YSBannerViewDelegate <NSObject>
+
+@optional
+
+/// 自定义Cell的样式 返回自定义 Cell 的 Class
+- (Class)bannerViewRegistCustomCellClass:(YSBannerView *)bannerView;
+/// 自定义Cell的样式 返回自定义 Cell 的 Nib
+- (UINib *)bannerViewRegistCustomCellNib:(YSBannerView *)bannerView;
+/// 自定义 Cell 刷新数据或者其他配置
+- (void)bannerView:(YSBannerView *)bannerView setupCell:(UICollectionViewCell *)cell index:(NSInteger)index;
+
+/// 滚动到 index
+- (void)bannerView:(YSBannerView *)bannerView didScrollToIndex:(NSInteger)index;
+/// 点击回调
+- (void)bannerView:(YSBannerView *)bannerView didSelectItemAtIndex:(NSInteger)index;
+
+@end
+
 @protocol YSBannerViewDataSource, YSBannerViewDelegate;
 
 @interface YSBannerView : UIView
@@ -58,10 +77,9 @@ typedef NS_ENUM(NSInteger, YSBannerViewDirection) {
 @property (nonatomic, strong) UIImage *pageDotImage;                    ///< 分页控件小圆标正常图片
 @property (nonatomic, strong) UIImage *currentPageDotImage;             ///< 当前分页控件小圆标图片
 
-/// 下面2个选项需要一起使用...
 @property (nonatomic, assign) CGSize itemSize;                          ///< CellSize，默认视图Size
 @property (nonatomic, assign) CGFloat itemSpacing;                      ///< Cell间距 默认: 0
-/// 需要联合上面两个选项一起使用
+
 @property (nonatomic, assign) CGFloat itemZoomFactor;                   ///< 放大缩小倍数 默认: 0
 
 @property (nonatomic, strong) UIFont  *titleFont;                       ///< 文字大小 默认: 14.0f
@@ -73,8 +91,6 @@ typedef NS_ENUM(NSInteger, YSBannerViewDirection) {
 
 /// 自定义设置网络和默认图片的方法
 @property (nonatomic, copy) void(^downloadImageBlock)(UIImageView *imageView, NSURL *url, UIImage *placeholderImage);
-@property (nonatomic, copy) void(^didScrollToIndexBlock)(NSInteger index);
-@property (nonatomic, copy) void(^didSelectItemAtIndexBlock)(NSInteger index);
 
 + (instancetype)bannerViewWithFrame:(CGRect)frame;
 + (instancetype)bannerViewWithFrame:(CGRect)frame imageArray:(NSArray *)imageArray;
@@ -89,23 +105,5 @@ typedef NS_ENUM(NSInteger, YSBannerViewDirection) {
 
 /// 禁用滑动手势 scrollEnable
 - (void)disableScrollGesture;
-
-@end
-
-@protocol YSBannerViewDelegate <NSObject>
-
-@optional
-
-/// 自定义Cell的样式 返回自定义 Cell 的 Class
-- (Class)bannerViewRegistCustomCellClass:(YSBannerView *)bannerView;
-/// 自定义Cell的样式 返回自定义 Cell 的 Nib
-- (UINib *)bannerViewRegistCustomCellNib:(YSBannerView *)bannerView;
-/// 自定义 Cell 刷新数据或者其他配置
-- (void)bannerView:(YSBannerView *)bannerView setupCell:(UICollectionViewCell *)cell index:(NSInteger)index;
-
-/// 滚动到 index
-- (void)bannerView:(YSBannerView *)bannerView didScrollToIndex:(NSInteger)index;
-/// 点击回调
-- (void)bannerView:(YSBannerView *)bannerView didSelectItemAtIndex:(NSInteger)index;
 
 @end

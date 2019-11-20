@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'YSBannerView'
-  s.version          = '1.1.0'
+  s.version          = '1.2.0'
   s.summary          = '使用简单、功能丰富、无依赖的 iOS图片、文字轮播器'
 
 # This description is used to generate tags and improve search results.

@@ -26,10 +26,11 @@
     
     _bannerView = [YSBannerView bannerViewWithFrame:CGRectMake(0, 100, kYSSCREEN_WIDTH, 200)];
     _bannerView.placeholderImage = [UIImage imageNamed:@"placeholder"];
-    _bannerView.itemSpacing = -25;
-    _bannerView.itemSize = CGSizeMake(kYSSCREEN_WIDTH-80, 200);
-    _bannerView.itemZoomFactor = 0.001;
-    _bannerView.autoScroll = YES;
+//    _bannerView.itemSpacing = -25;
+//    _bannerView.itemSize = CGSizeMake(kYSSCREEN_WIDTH-80, 200);
+//    _bannerView.itemZoomFactor = 0.001;
+    _bannerView.scrollDirection = YSBannerViewDirectionTop;
+    _bannerView.autoScroll = NO;
     
     _bannerView.downloadImageBlock = ^(UIImageView *imageView, NSURL *url, UIImage *placeholderImage) {
         [imageView sd_setImageWithURL:url placeholderImage:placeholderImage];
